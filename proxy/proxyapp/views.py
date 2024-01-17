@@ -53,11 +53,9 @@ class Route(RouteInterface):
     def send(self, uri: str, method: str = 'GET') -> None:
         params = self.get_parameters()
         url = 'http://core.webstktw.beget.tech/api/v0/apps/' + self.APP_ID + uri
-        print(url)
         request = requests.request(method=method, url=url, json=params)
         content = json.loads(request.content)
         status_code = request.status_code
-        print(content)
         self.set_response(content=content, status_code=status_code)
 
 
