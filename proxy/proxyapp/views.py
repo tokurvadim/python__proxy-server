@@ -10,7 +10,7 @@ class RouteInterface:
     __metaclass__ = ABCMeta
 
     @abstractmethod
-    def set_parameters(self, data: dict) -> dict:
+    def set_parameters(self, data: dict) -> None:
         pass
 
     @abstractmethod
@@ -18,7 +18,7 @@ class RouteInterface:
         pass
 
     @abstractmethod
-    def set_response(self, data: dict) -> dict:
+    def set_response(self, data: dict) -> None:
         pass
 
     @abstractmethod
@@ -40,14 +40,12 @@ class Route(RouteInterface):
             self._parameters = data
         else:
             self._parameters = {}
-        return self._parameters
 
     def get_parameters(self):
         return self._parameters
 
     def set_response(self, data):
         self._response = data
-        return self._response
 
     def get_response(self):
         return self._response
