@@ -18,7 +18,7 @@ class RouteInterface:
         pass
 
     @abstractmethod
-    def set_response(self, data: dict) -> None:
+    def set_response(self, **data: dict) -> None:
         pass
 
     @abstractmethod
@@ -44,7 +44,7 @@ class Route(RouteInterface):
     def get_parameters(self):
         return self._parameters
 
-    def set_response(self, data):
+    def set_response(self, **data):
         self._response = data
 
     def get_response(self):
@@ -56,7 +56,9 @@ class Route(RouteInterface):
         print(url)
         request = requests.request(method=method, url=url, json=params)
         content = json.loads(request.content)
-        self.set_response(content)
+        status_code = request.status_code
+        print(content)
+        self.set_response(content=content, status_code=status_code)
 
 
 class BotList(Route, APIView):
@@ -68,16 +70,15 @@ class BotList(Route, APIView):
         self.set_parameters(data)
         super().send(method=request.method, uri=path)
         response = self.get_response()
-        return Response(data=response)
+        return Response(data=response['content'], status=response['status_code'])
 
     def post(self, request):
-        response = {
-            'error': {
-                'code': '404',
-                'message': 'Route not found'
-            }
-        }
-        return Response(data=response, status=404)
+        path = self.catalog
+        data = request.body
+        self.set_parameters(data)
+        super().send(method=request.method, uri=path)
+        response = self.get_response()
+        return Response(data=response['content'], status=response['status_code'])
 
 
 class BotDetails(Route, APIView):
@@ -88,79 +89,55 @@ class BotDetails(Route, APIView):
         path = self.catalog + uri
         super().send(method=request.method, uri=path)
         response = self.get_response()
-        return Response(data=response)
+        return Response(data=response['content'], status=response['status_code'])
 
     def post(self, request, id):
-        response = {
-            'error': {
-                'code': '404',
-                'message': 'Route not found'
-            }
-        }
-        return Response(data=response, status=404)
+        uri = str(id)
+        path = self.catalog + uri
+        super().send(method=request.method, uri=path)
+        response = self.get_response()
+        return Response(data=response['content'], status=response['status_code'])
 
 
 class Register(Route, APIView):
     catalog = '/users/'
 
     def get(self, request):
-        response = {
-            'error': {
-                'code': '404',
-                'message': 'Route not found'
-            }
-        }
-        return Response(data=response, status=404)
+        data = request.body
+        data = json.loads(data)
+        self.set_parameters(data)
+        path = self.catalog
+        super().send(method=request.method, uri=path)
+        response = self.get_response()
+        return Response(data=response['content'], status=response['status_code'])
 
     def post(self, request):
         data = request.body
         data = json.loads(data)
-        if len(data) == 2:
-            self.set_parameters(data)
-        else:
-            response = {
-                'error': {
-                    'status': '404',
-                    'code': 'bad_body',
-                    'message': 'Invalid body parameters'
-                }
-            }
-            return Response(data=response)
-
+        self.set_parameters(data)
         path = self.catalog
         super().send(method=request.method, uri=path)
         response = self.get_response()
-        return Response(data=response)
+        return Response(data=response['content'], status=response['status_code'])
 
 
 class Login(Route, APIView):
     catalog = '/users/login/'
 
     def get(self, request):
-        response = {
-            'error': {
-                'code': '404',
-                'message': 'Route not found'
-            }
-        }
-        return Response(data=response, status=404)
+        data = request.body
+        data = json.loads(data)
+        self.set_parameters(data)
+        path = self.catalog
+        super().send(method=request.method, uri=path)
+        response = self.get_response()
+        return Response(data=response['content'], status=response['status_code'])
 
     def post(self, request):
         data = request.body
         data = json.loads(data)
-        if len(data) == 2:
-            self.set_parameters(data)
-        else:
-            response = {
-                'error': {
-                    'status': '404',
-                    'code': 'bad_body',
-                    'message': 'Invalid body parameters'
-                }
-            }
-            return Response(data=response, status=404)
-
+        self.set_parameters(data)
         path = self.catalog
         super().send(method=request.method, uri=path)
         response = self.get_response()
-        return Response(data=response)
+        return Response(data=response['content'], status=response['status_code'])
